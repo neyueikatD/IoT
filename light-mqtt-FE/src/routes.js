@@ -5,6 +5,7 @@ import History from "views/History";
 // import Icons from "views/Icons.js";
 // import Maps from "views/Maps.js";
 import Dashboard2 from "views/Dashboard2";
+import Db2 from "views/Dashboard2";
 // import Upgrade from "views/Upgrade.js";
 
 const dashboardRoutes = [
@@ -45,10 +46,10 @@ const dashboardRoutes = [
     layout: "/admin"
   },
   {
-    path: "/dashboard2",
+    path: "/db2",
     name: "Dashboard 2",
     icon: "nc-icon nc-bell-55",
-    component: Dashboard2,
+    component: Db2,
     layout: "/admin"
   },
   // {

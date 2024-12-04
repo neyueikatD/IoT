@@ -27,7 +27,7 @@ mongoose.connect("mongodb://localhost:27017/test")
   .catch((err) => console.error('Kết nối MongoDB thất bại', err)); // Thông báo nếu kết nối thất bại
 
 // Cài đặt client MQTT
-const mqttClient = mqtt.connect('mqtt://172.20.10.3:1884', {
+const mqttClient = mqtt.connect('mqtt://172.20.10.2:1884', {
   username: 'tky', // Tên người dùng
   password: 'tky' // Mật khẩu
 });
@@ -68,7 +68,7 @@ mqttClient.on('message', async (topic, message) => {
     try {
       await newSensorData.save(); // Save the sensor data to MongoDB
       // console.log('Sensor data saved successfully');
-      
+
     } catch (err) {
       console.error('Error saving sensor data:', err); // Notify if there is an error saving data
     }
@@ -123,7 +123,7 @@ app.get('/sensor-data', async (req, res) => {
     temperature,          // Tham số nhiệt độ để lọc
     humidity,             // Tham số độ ẩm để lọc
     lighting,            // Tham số ánh sáng để lọc
-    // newS,
+    searchTime,
     sortTemperature,      // Tham số để sắp xếp theo nhiệt độ
     sortHumidity,         // Tham số để sắp xếp theo độ ẩm
     sortLighting,// Tham số để sắp xếp theo ánh sáng
@@ -148,18 +148,19 @@ app.get('/sensor-data', async (req, res) => {
   if (lighting && !isNaN(parseInt(lighting)) && Number.isInteger(parseInt(lighting))) { // Kiểm tra và ép kiểu lighting thành số nguyên
     filter.lighting = parseInt(lighting);         // Lọc theo ánh sáng nếu có và đảm bảo là số nguyên
   }
-
   
-  // Điều kiện lọc theo khoảng thời gian (từ startDate đến endDate)
-  if (startDate || endDate) { 
-    filter.timestamp = {}; // Tạo điều kiện lọc cho trường timestamp
+  // Filter by date range (startDate to endDate)
+  if (startDate || endDate) {
+    // Ensure the filter includes both date range and regex if searchTime exists
+    filter.timestamp = filter.timestamp || {}; // Use existing timestamp filter or initialize an empty object
     if (startDate) {
-      filter.timestamp.$gte = new Date(startDate); // Lọc từ ngày bắt đầu (>= startDate)
+      filter.timestamp.$gte = new Date(startDate); // Filter from startDate
     }
     if (endDate) {
-      filter.timestamp.$lte = new Date(endDate);   // Lọc đến ngày kết thúc (<= endDate)
+      filter.timestamp.$lte = new Date(endDate); // Filter until endDate
     }
   }
+  
 
   // Tùy chọn sắp xếp theo các tham số nếu được cung cấp
   if (sortTemperature) {
@@ -203,22 +204,52 @@ app.get('/sensor-data', async (req, res) => {
         return acc;
       }, {});
       
-      console.log(historyResult);
-      // Tính tổng số tài liệu (dữ liệu cảm biến) phù hợp với điều kiện lọc
-      const totalDocuments = await SensorData.countDocuments(filter);
-      const totalPages = Math.ceil(totalDocuments / limit); // Tính số trang dựa trên giới hạn mỗi trang
-
+      // console.log(historyResult);
       // Tìm kiếm dữ liệu cảm biến theo điều kiện lọc và sắp xếp, phân trang
-      const sensors = await SensorData.find(filter)
-          .sort(sortOptions)               // Áp dụng tùy chọn sắp xếp
-          .skip((page - 1) * limit)        // Bỏ qua các tài liệu để phân trang
-          .limit(parseInt(limit));         // Giới hạn số lượng tài liệu trên mỗi trang
+      let pipeline = [];
 
-          // console.log(sensors);
+
+      if(searchTime){
+        const reg = "" + searchTime.replace(/[.*+?^=!:${}()|\[\]\/\\]/g, "\\$&") + ""; // Escape special regex chars
+        // console.log(reg);
+        const tmp = {
+          $match: {
+            $expr: {
+              $regexMatch: {
+                input: { 
+                  $dateToString: { format: "%m/%d/%Y, %H:%M:%S", date: "$timestamp", timezone: "Asia/Ho_Chi_Minh" } //%d/%m/%Y, %H:%M:%S
+                }, // Convert to stringMM/dd/yyyy, h:mm:ss a
+                regex: `^${reg}`,
+                options: "i"
+              }
+            }
+          },
+        };
+        pipeline.push(tmp);
+      }
+
+
+      pipeline.push({ $match : filter});
+      pipeline.push({ $sort: sortOptions });
+      // pipeline.push({ $skip: (page - 1) * limit });
+      // pipeline.push({ $limit: parseInt(limit, 10) });
+      const sensors = await SensorData.aggregate(pipeline);
+
+      const startIndex = (page - 1) * limit;
+      const endIndex = startIndex + parseInt(limit, 10);
+      const paginatedSensors = sensors.slice(startIndex, endIndex);
+      
+      // Calculate total number of documents
+      const totalDocuments = sensors.length;
+      const totalPages = Math.ceil(totalDocuments / limit); 
+      console.log(JSON.stringify(pipeline, null, 2));
+      
+      
+      console.log(paginatedSensors);
           
       res.json({
         status: historyResult,
-        data: sensors,
+        data: paginatedSensors,
         totalDocuments,
         totalPages: totalPages, // Tính số trang
         currentPage: page // Trang hiện tại
@@ -267,6 +298,7 @@ app.get('/history', async (req, res) => {
     limit = 10,           // Giới hạn số lượng kết quả trên mỗi trang, mặc định là 10
     device,               // Tham số thiết bị để lọc
     state,               // Tham số hành động để lọc
+    searchTime,
     startDate,            // Thời gian bắt đầu
     endDate,              // Thời gian kết thúc
     sortTimestamp         // Tham số để sắp xếp theo thời gian
@@ -297,24 +329,62 @@ app.get('/history', async (req, res) => {
   }
 
   // Tùy chọn sắp xếp theo thời gian nếu có
+
   if (sortTimestamp) {
+    console.log("stt " + typeof sortTimestamp);
+    console.log("stt " + sortTimestamp);
       sortOptions.timestamp = sortTimestamp === 'desc' ? -1 : 1;     // Sắp xếp theo thời gian giảm dần hoặc tăng dần
   }
 
   try {
-      // Tính tổng số tài liệu (lịch sử) phù hợp với điều kiện lọc
-      const totalDocuments = await History.countDocuments(filter);
-      const totalPages = Math.ceil(totalDocuments / limit); // Tính số trang
+      // // Tính tổng số tài liệu (lịch sử) phù hợp với điều kiện lọc
+      // const totalDocuments = await History.countDocuments(filter);
+      // const totalPages = Math.ceil(totalDocuments / limit); // Tính số trang
 
-      // Tìm kiếm dữ liệu lịch sử theo điều kiện lọc và sắp xếp, phân trang
-      const histories = await History.find(filter)
-          .sort(sortOptions)               // Áp dụng tùy chọn sắp xếp
-          .skip((page - 1) * limit)        // Bỏ qua các tài liệu để phân trang
-          .limit(parseInt(limit));         // Giới hạn số lượng tài liệu trên mỗi trang
+      // // Tìm kiếm dữ liệu lịch sử theo điều kiện lọc và sắp xếp, phân trang
+      // const histories = await History.find(filter)
+      //     .sort(sortOptions)               // Áp dụng tùy chọn sắp xếp
+      //     .skip((page - 1) * limit)        // Bỏ qua các tài liệu để phân trang
+      //     .limit(parseInt(limit));         // Giới hạn số lượng tài liệu trên mỗi trang
+      let pipeline = [];
 
+
+      if(searchTime){
+        const reg = "" + searchTime.replace(/[.*+?^=!:${}()|\[\]\/\\]/g, "\\$&") + ""; // Escape special regex chars
+        // console.log(reg);
+        const tmp = {
+          $match: {
+            $expr: {
+              $regexMatch: {
+                input: { 
+                  $dateToString: { format: "%m/%d/%Y, %H:%M:%S", date: "$timestamp", timezone: "Asia/Ho_Chi_Minh" } //%d/%m/%Y, %H:%M:%S
+                }, // Convert to stringMM/dd/yyyy, h:mm:ss a
+                regex: `^${reg}`,
+                options: "i"
+              }
+            }
+          },
+        };
+        pipeline.push(tmp);
+      }
+
+
+      pipeline.push({ $match : filter});
+      pipeline.push({ $sort: sortOptions });
+      // pipeline.push({ $skip: (page - 1) * limit });
+      // pipeline.push({ $limit: parseInt(limit, 10) });
+      const historyData = await History.aggregate(pipeline);
+      const startIndex = (page - 1) * limit;
+      const endIndex = startIndex + parseInt(limit, 10);
+      const paginatedHistorys = historyData.slice(startIndex, endIndex);
+      
+      // Calculate total number of documents
+      const totalDocuments = historyData.length;
+      const totalPages = Math.ceil(totalDocuments / limit); 
+      
       res.json({
-        data: histories,
-        totalDocuments,
+        data: paginatedHistorys,
+        totalDocuments: totalDocuments,
         totalPages: totalPages, // Tính số trang
         currentPage: page // Trang hiện tại
       });

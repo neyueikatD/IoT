@@ -3,7 +3,7 @@ import axios from 'axios';
 import Chart from 'react-apexcharts';
 import './Dashboard2.css';
 
-const Dashboard2 = () => {
+const Db2 = () => {
   const [sensorData, setSensorData] = useState([]);
   const [newS, setNewS] = useState(0);
   const [isLight2On, setIsLight2On] = useState(false);
@@ -143,4 +143,4 @@ const Dashboard2 = () => {
   );
 };
 
-export default Dashboard2;
+export default Db2;

@@ -22,10 +22,10 @@ const Dashboard = () => {
       console.log(response.data.status);
       const deviceStatus = response.data.status;
       setIsACOn(deviceStatus.ac === 'ON');
-      setIsACOn(deviceStatus.fan === 'ON');
-      setIsACOn(deviceStatus.led1 === 'ON');
-      setIsACOn(deviceStatus.led2 === 'ON');
-      setIsACOn(deviceStatus.led3 === 'ON');
+      setIsFanOn(deviceStatus.fan === 'ON');
+      setIsLightOn(deviceStatus.led1 === 'ON');
+      // setIsLed2On(deviceStatus.led2 === 'ON');
+      // setIsLed3On(deviceStatus.led3 === 'ON');
       //get trang thai
       setSensorData(data);
       // const ledState = response.data.ledState

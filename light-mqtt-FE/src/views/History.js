@@ -8,6 +8,7 @@ const History = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalDocuments, setTotalDocuments] = useState();
   const [filters, setFilters] = useState({
     device: '',
     state: '',
@@ -18,21 +19,23 @@ const History = () => {
   const fetchHistory = async () => {
     setLoading(true);
     try {
-      const { device, state } = filters;
+      const { device, state, searchTime } = filters;
       const { key, direction } = sortConfig;
-      const response = await axios.get('http://localhost:3000/history?sortTimestamp=desc', {
+      const response = await axios.get('http://localhost:3000/history', {
         params: {
           page: currentPage,
           limit: 10, // Limit per page
           device,
           state,
-          sortKey: key,
-          sortDirection: direction,
+          searchTime,
+          sortTimestamp: sortConfig.direction
         },
       });
-
       setHistoryData(response.data.data);
       setTotalPages(response.data.totalPages);
+      setTotalDocuments(response.data.totalDocuments);
+      console.log(sortConfig.direction);
+
     } catch (error) {
       console.error('Error fetching history data:', error);
     } finally {
@@ -59,7 +62,7 @@ const History = () => {
   const handleSort = (key) => {
     setSortConfig((prevConfig) => ({
       key,
-      direction: prevConfig.direction === 'asc' ? 'desc' : 'asc',
+      direction: prevConfig.key === key && prevConfig.direction === 'asc' ? 'desc' : 'asc',
     }));
   };
 
@@ -94,8 +97,19 @@ const History = () => {
             <option value="OFF">OFF</option>
           </select>
         </label>
+        <label>
+          <label>Time:</label>
+          <input
+            type="string"
+            name="searchTime"
+            value={filters.searchTime}
+            onChange={handleFilterChange}
+          />
+        </label>
       </div>
-
+      <div>
+        <p className='mt-2'>Số kết quả: <strong>{totalDocuments}</strong></p>
+      </div>
       {loading ? (
         <p>Loading data...</p>
       ) : (
@@ -104,8 +118,8 @@ const History = () => {
             <thead>
               <tr>
                 <th className='no-sort'>ID</th>
-                <th onClick={() => handleSort('device')}>Device</th>
-                <th onClick={() => handleSort('state')}>Action</th>
+                <th className='no-sort'>Device</th>
+                <th className='no-sort'>Action</th>
                 <th onClick={() => handleSort('timestamp')}>Timestamp</th>
               </tr>
             </thead>
@@ -116,7 +130,14 @@ const History = () => {
                   <td>{(currentPage - 1) * 10 + index + 1}</td>
                   <td>{item.device}</td>
                   <td>{item.state}</td>
-                  <td>{new Date(item.timestamp).toLocaleString()}</td>
+                  <td>
+                    {`${String(new Date(item.timestamp).getMonth() + 1).padStart(2, "0")}`}{"/"}
+                    {`${String(new Date(item.timestamp).getDate()).padStart(2, "0")}`}{"/"}
+                    {`${new Date(item.timestamp).getFullYear()}`}{", "}
+                    {`${String(new Date(item.timestamp).getHours()).padStart(2, "0")}`}{":"}
+                    {`${String(new Date(item.timestamp).getMinutes()).padStart(2, "0")}`}{":"}
+                    {`${String(new Date(item.timestamp).getSeconds()).padStart(2, "0")}`}
+                  </td>
                 </tr>
               ))}
             </tbody>

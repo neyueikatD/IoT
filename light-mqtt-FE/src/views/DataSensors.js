@@ -7,10 +7,12 @@ const SensorData = () => {
   const [sensorData, setSensorData] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalDocuments, setTotalDocuments] = useState();
   const [filters, setFilters] = useState({
     temperature: '',
     humidity: '',
     lighting: '',
+    searchTime: '',
     startDate: '',
     endDate: '',
   });
@@ -18,7 +20,7 @@ const SensorData = () => {
 
   const fetchData = async () => {
     try {
-      const { temperature, humidity, lighting, startDate, endDate } = filters;
+      const { temperature, humidity, lighting, searchTime, startDate, endDate } = filters;
       const { key, direction } = sortConfig;
 
       const sortParams = {
@@ -37,14 +39,18 @@ const SensorData = () => {
           temperature,
           humidity,
           lighting,
+          searchTime,
           startDate,
           endDate,
           [sortQueryParam]: direction,
         },
       });
+      console.log("currentPage " + currentPage);
 
       setSensorData(response.data.data);
       setTotalPages(response.data.totalPages);
+      setTotalDocuments(response.data.totalDocuments);
+      // console.log("totalDocuments" + response.data.totalDocuments);
     } catch (error) {
       console.error('Error fetching sensor data', error);
     }
@@ -166,6 +172,15 @@ const SensorData = () => {
       {/* Hàng 2: Start Date, End Date */}
       <div className="filter-row">
         <div className="filter-group">
+          <label>Time:</label>
+          <input
+            type="string"
+            name="searchTime"
+            value={filters.searchTime}
+            onChange={handleFilterChange}
+          />
+        </div>
+        <div className="filter-group">
           <label>Start Date:</label>
           <input
             type="date"
@@ -175,7 +190,7 @@ const SensorData = () => {
           />
         </div>
         <div className="filter-group">
-          <label>End Date:</label>
+          <label>End Date: </label>
           <input
             type="date"
             name="endDate"
@@ -184,6 +199,9 @@ const SensorData = () => {
           />
         </div>
       </div>
+    </div>
+    <div>
+      <p className='mt-2'>Số kết quả: <strong>{totalDocuments}</strong></p>
     </div>
 
       {sensorData.length === 0 ? (
@@ -208,7 +226,14 @@ const SensorData = () => {
                 <td>{sensor.humidity}</td>
                 <td>{sensor.lighting}</td>
                 <td>{sensor.newS}</td>
-                <td>{new Date(sensor.timestamp).toLocaleString()}</td>
+                <td>
+                    {`${String(new Date(sensor.timestamp).getMonth() + 1).padStart(2, "0")}`}{"/"}
+                    {`${String(new Date(sensor.timestamp).getDate()).padStart(2, "0")}`}{"/"}
+                    {`${new Date(sensor.timestamp).getFullYear()}`}{", "}
+                    {`${String(new Date(sensor.timestamp).getHours()).padStart(2, "0")}`}{":"}
+                    {`${String(new Date(sensor.timestamp).getMinutes()).padStart(2, "0")}`}{":"}
+                    {`${String(new Date(sensor.timestamp).getSeconds()).padStart(2, "0")}`}
+                  </td>
               </tr>
             ))}
           </tbody>
