@@ -1,0 +1,114 @@
+/* Container chính */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Bộ lọc */
+  .filters {
+    margin-bottom: 20px;
+  }
+  
+  .filters label {
+    margin-right: 20px;
+    font-weight: bold;
+  }
+  
+  .filters input, .filters select {
+    padding: 8px;
+    margin-left: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  /* Bảng lịch sử */
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .table th, .table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff; /* Nền trắng để làm nổi bật */
+    border-radius: 8px; /* Bo tròn góc bảng */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Hiệu ứng shadow */
+    overflow: hidden; /* Giữ cho các góc bo không bị lệch */
+  }
+  
+  /* Tiêu đề bảng */
+  th {
+    background-color: #007bff; /* Màu nền xanh */
+    color: #fff; /* Màu chữ trắng */
+    text-transform: uppercase; /* Chữ in hoa */
+    letter-spacing: 1px; /* Khoảng cách chữ */
+    text-align: center; /* Căn giữa nội dung */
+    position: relative; /* Để hỗ trợ đặt tam giác */
+    cursor: pointer; /* Con trỏ hiển thị khi di chuột */
+    transition: all 0.2s ease; /* Hiệu ứng mượt */
+  }
+
+  
+  
+  .table tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  /* Pagination */
+  .pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .pagination button {
+    padding: 10px 20px;
+    margin: 0 5px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+  }
+  
+  .pagination button:disabled {
+    cursor: not-allowed;
+    background-color: #e9e9e9;
+  }
+  
+  .pagination button:hover:not(:disabled) {
+    background-color: #f1f1f1;
+  }
+  
+  /* Thông báo tải dữ liệu */
+  .loading-message {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #888;
+  }
+  
+  /* Thông báo khi không có kết quả */
+  .no-results {
+    text-align: center;
+    font-size: 16px;
+    color: #d9534f;
+    font-weight: bold;
+  }
+  
+  /* Thêm khoảng cách giữa các phần tử */
+  p {
+    font-size: 16px;
+    color: #333;
+  }
+  

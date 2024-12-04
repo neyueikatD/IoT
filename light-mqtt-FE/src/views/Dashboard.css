@@ -1,0 +1,57 @@
+.dashboard {
+  padding-right: 20px;
+  padding-left: 20px;
+}
+
+.row {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.col {
+  flex: 1;
+  margin: 10px;
+}
+
+.card {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.alert {
+  background-color: #f8d7da;
+}
+
+.normal {
+  background-color: #d4edda;
+}
+.stat-box {
+  display: flex; /* Use flexbox for alignment */
+  flex-direction: column; /* Stack items vertically */
+  justify-content: center; /* Center items vertically */
+  align-items: center; /* Center items horizontally */
+  border-radius: 5px; /* Rounded corners */
+  padding: 20px; /* Padding for spacing inside the boxes */
+  transition: background-color 0.3s; /* Optional: smooth transition for background color on hover */
+}
+
+.stat-box:hover {
+  transform: scale(1.1);
+}
+
+.stat-box h3 {
+  margin: 0; /* Remove margin around h3 */
+  font-size: 1.5rem; /* Increase font size for headings */
+  display: flex; /* Use flexbox for the h3 to align icon and text */
+  align-items: center; /* Center icon and text vertically */
+}
+
+.sensor-value {
+  font-size: 1.2rem; /* Increase the font size for sensor values */
+  margin-top: 10px; /* Space above the value */
+  text-align: center; /* Center the value text */
+}
+

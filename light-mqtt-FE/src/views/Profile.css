@@ -1,0 +1,68 @@
+
+/* Định dạng chung cho container của Profile */
+.content2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Chiếm hết chiều cao màn hình */
+    padding: 20px;
+    background-color: #f8f9fa;
+    box-sizing: border-box;
+  }
+  
+  /* Định dạng cho Card */
+  .card {
+    width: 100%; /* Card chiếm hết chiều rộng của container */
+    max-width: 600px; /* Card không vượt quá chiều rộng này */
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    background-color: #fff;
+    overflow: hidden;
+    text-align: center;
+  }
+  
+  /* Định dạng cho ảnh trong Card */
+  .card-img-top {
+    width: 100%;
+    height: 300px; /* Chiều cao ảnh */
+    object-fit: cover; /* Cắt ảnh để phù hợp với Card */
+    border-bottom: 2px solid #ddd;
+  }
+  
+  /* Định dạng cho phần thông tin cơ bản */
+  .card-text div {
+    margin-bottom: 15px;
+    font-size: 18px; /* Cỡ chữ lớn hơn một chút */
+    line-height: 1.6;
+    color: #333;
+    text-align: left; /* Căn trái cho thông tin */
+  }
+  
+  /* Link trong thông tin */
+  .card-text a {
+    text-decoration: none;
+    color: #007bff;
+  }
+  
+  
+  
+  /* Định dạng cho các thẻ GitHub và PDF */
+.card-body a {
+    display: inline-block;
+    margin-top: 10px; /* Giảm khoảng cách trên để các thẻ gần nhau hơn */
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: all 0.3s ease; /* Thêm hiệu ứng mượt mà cho chuyển động */
+}
+
+/* Hiệu ứng khi di chuột vào */
+.card-body a:hover {
+    transform: translateY(-5px); /* Nổi lên khi di chuột */
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2); /* Tạo bóng để nổi bật hơn */
+}
+
+  
+  

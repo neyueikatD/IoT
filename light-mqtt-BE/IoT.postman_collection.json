@@ -1,0 +1,107 @@
+{
+	"info": {
+		"_postman_id": "e0291373-c63e-4631-abb9-838fdaf2b053",
+		"name": "IoT",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34678624",
+		"_collection_link": "https://red-eclipse-63721.postman.co/workspace/My-Workspace~50899c26-ddd6-4c2e-8f55-06dc17896952/collection/34678624-e0291373-c63e-4631-abb9-838fdaf2b053?action=share&source=collection_link&creator=34678624"
+	},
+	"item": [
+		{
+			"name": "/sensor-data",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000 /sensor-data?page=1&limit=10&sortTemperature=asc&sortHumidity=asc&sortLighting=desc",
+					"host": [
+						"localhost"
+					],
+					"port": "3000 ",
+					"path": [
+						"sensor-data"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "limit",
+							"value": "10"
+						},
+						{
+							"key": "temperature",
+							"value": "26",
+							"disabled": true
+						},
+						{
+							"key": "humidity",
+							"value": "60",
+							"disabled": true
+						},
+						{
+							"key": "lighting",
+							"value": "500",
+							"disabled": true
+						},
+						{
+							"key": "sortTemperature",
+							"value": "asc"
+						},
+						{
+							"key": "sortHumidity",
+							"value": "asc"
+						},
+						{
+							"key": "sortLighting",
+							"value": "desc"
+						},
+						{
+							"key": "sortTimestamp ",
+							"value": "desc",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/control",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"device\": \"ac\",\r\n  \"action\": \"OFF\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/control",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"control"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/history",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}
